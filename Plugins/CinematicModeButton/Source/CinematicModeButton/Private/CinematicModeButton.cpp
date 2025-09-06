@@ -10,6 +10,7 @@
 #include "Engine/Level.h"
 #include "Engine/DirectionalLight.h"
 #include "Components/LightComponent.h"
+#include "Engine/PostProcessVolume.h"
 
 static const FName CinematicModeButtonTabName("CinematicModeButton");
 
@@ -54,15 +55,34 @@ void FCinematicModeButtonModule::PluginButtonClicked()
 	FText DialogText = FText::FromString("Enabling Cinematic Mode for This Level");
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
 
-	if (AActor* FoundLightActor = FindActor(ADirectionalLight::StaticClass()))
+	if (AActor* FoundLightActor = FindActorInLevel(ADirectionalLight::StaticClass()))
 	{
 		ADirectionalLight* LightActor = Cast<ADirectionalLight>(FoundLightActor);
 		LightActor->GetLightComponent()->SetIntensity(1);
 	} else
 	{
-		AActor* NewLightActor = AddActorToScene(ADirectionalLight::StaticClass());
+		AActor* NewLightActor = AddActorToLevel(ADirectionalLight::StaticClass());
 		ADirectionalLight* LightActor = Cast<ADirectionalLight>(NewLightActor);
 		LightActor->GetLightComponent()->SetIntensity(1);
+	}
+
+	if (AActor* FoundPPVolActor = FindActorInLevel(APostProcessVolume::StaticClass()))
+	{
+		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(FoundPPVolActor);
+		PPVolActor->bUnbound = true;
+		PPVolActor->Settings.bOverride_AutoExposureBias = true;
+		PPVolActor->Settings.AutoExposureBias = 0;
+		PPVolActor->Settings.bOverride_VignetteIntensity = true;
+		PPVolActor->Settings.VignetteIntensity = 2.5f;
+	} else
+	{
+		AActor* NewPPVolActor = AddActorToLevel(APostProcessVolume::StaticClass());
+		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(NewPPVolActor);
+		PPVolActor->bUnbound = true;
+		PPVolActor->Settings.bOverride_AutoExposureBias = true;
+		PPVolActor->Settings.AutoExposureBias = 0;
+		PPVolActor->Settings.bOverride_VignetteIntensity = true;
+		PPVolActor->Settings.VignetteIntensity = 2.5f;
 	}
 }
 
@@ -91,7 +111,7 @@ void FCinematicModeButtonModule::RegisterMenus()
 	}
 }
 
-AActor* FCinematicModeButtonModule::FindActor(TSubclassOf<AActor> ActorClass)
+AActor* FCinematicModeButtonModule::FindActorInLevel(TSubclassOf<AActor> ActorClass)
 {
 	TArray<AActor*> FoundActors;
 
@@ -107,7 +127,7 @@ AActor* FCinematicModeButtonModule::FindActor(TSubclassOf<AActor> ActorClass)
 	return nullptr;
 }
 
-AActor* FCinematicModeButtonModule::AddActorToScene(TSubclassOf<AActor> ActorClass)
+AActor* FCinematicModeButtonModule::AddActorToLevel(TSubclassOf<AActor> ActorClass)
 {
 	ULevel* CurrentLevel = GWorld->GetCurrentLevel();
 	return CurrentLevel->OwningWorld->SpawnActor<AActor>(ActorClass, FTransform::Identity);
