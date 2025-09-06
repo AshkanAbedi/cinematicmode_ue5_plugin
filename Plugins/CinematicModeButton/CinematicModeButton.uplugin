@@ -1,0 +1,24 @@
+{
+	"FileVersion": 3,
+	"Version": 1,
+	"VersionName": "1.0",
+	"FriendlyName": "CinematicModeButton",
+	"Description": "A simple button which adds a Post Process Volume, sets manual exposure, adds a vigenette effect and adds a CineCameraActor to the scene.",
+	"Category": "Other",
+	"CreatedBy": "Ashkan Abedi",
+	"CreatedByURL": "",
+	"DocsURL": "",
+	"MarketplaceURL": "",
+	"SupportURL": "",
+	"CanContainContent": false,
+	"IsBetaVersion": false,
+	"IsExperimentalVersion": false,
+	"Installed": false,
+	"Modules": [
+		{
+			"Name": "CinematicModeButton",
+			"Type": "Editor",
+			"LoadingPhase": "Default"
+		}
+	]
+}
