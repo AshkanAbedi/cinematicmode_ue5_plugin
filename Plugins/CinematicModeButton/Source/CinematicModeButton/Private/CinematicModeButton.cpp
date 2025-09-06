@@ -5,6 +5,11 @@
 #include "CinematicModeButtonCommands.h"
 #include "Misc/MessageDialog.h"
 #include "ToolMenus.h"
+#include "Kismet/GameplayStatics.h"
+#include "Editor/EditorEngine.h"
+#include "Engine/Level.h"
+#include "Engine/DirectionalLight.h"
+#include "Components/LightComponent.h"
 
 static const FName CinematicModeButtonTabName("CinematicModeButton");
 
@@ -46,12 +51,19 @@ void FCinematicModeButtonModule::ShutdownModule()
 void FCinematicModeButtonModule::PluginButtonClicked()
 {
 	// Put your "OnButtonClicked" stuff here
-	FText DialogText = FText::Format(
-							LOCTEXT("PluginButtonDialogText", "Add code to {0} in {1} to override this button's actions"),
-							FText::FromString(TEXT("FCinematicModeButtonModule::PluginButtonClicked()")),
-							FText::FromString(TEXT("CinematicModeButton.cpp"))
-					   );
+	FText DialogText = FText::FromString("Enabling Cinematic Mode for This Level");
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
+
+	if (AActor* FoundLightActor = FindActor(ADirectionalLight::StaticClass()))
+	{
+		ADirectionalLight* LightActor = Cast<ADirectionalLight>(FoundLightActor);
+		LightActor->GetLightComponent()->SetIntensity(1);
+	} else
+	{
+		AActor* NewLightActor = AddActorToScene(ADirectionalLight::StaticClass());
+		ADirectionalLight* LightActor = Cast<ADirectionalLight>(NewLightActor);
+		LightActor->GetLightComponent()->SetIntensity(1);
+	}
 }
 
 void FCinematicModeButtonModule::RegisterMenus()
@@ -77,6 +89,28 @@ void FCinematicModeButtonModule::RegisterMenus()
 			}
 		}
 	}
+}
+
+AActor* FCinematicModeButtonModule::FindActor(TSubclassOf<AActor> ActorClass)
+{
+	TArray<AActor*> FoundActors;
+
+	const UObject* WorldContextObject = GWorld;
+
+	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ActorClass, FoundActors);
+
+	if (FoundActors.Num() > 0)
+	{
+		return FoundActors[0];
+	}
+		
+	return nullptr;
+}
+
+AActor* FCinematicModeButtonModule::AddActorToScene(TSubclassOf<AActor> ActorClass)
+{
+	ULevel* CurrentLevel = GWorld->GetCurrentLevel();
+	return CurrentLevel->OwningWorld->SpawnActor<AActor>(ActorClass, FTransform::Identity);
 }
 
 #undef LOCTEXT_NAMESPACE

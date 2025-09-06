@@ -2,7 +2,10 @@
 
 #pragma once
 
+#include "CoreMinimal.h"
 #include "Modules/ModuleManager.h"
+#include "GameFramework/Actor.h"
+#include "UObject/NoExportTypes.h"
 
 class FToolBarBuilder;
 class FMenuBuilder;
@@ -17,11 +20,14 @@ public:
 	
 	/** This function will be bound to Command. */
 	void PluginButtonClicked();
+
 	
 private:
 
 	void RegisterMenus();
-
+	
+	AActor* FindActor(TSubclassOf<AActor> ActorClass);
+	AActor* AddActorToScene(TSubclassOf<AActor> ActorClass);
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
