@@ -43,7 +43,8 @@ TSharedRef< FSlateStyleSet > FCinematicModeButtonStyle::Create()
 	TSharedRef< FSlateStyleSet > Style = MakeShareable(new FSlateStyleSet("CinematicModeButtonStyle"));
 	Style->SetContentRoot(IPluginManager::Get().FindPlugin("CinematicModeButton")->GetBaseDir() / TEXT("Resources"));
 
-	Style->Set("CinematicModeButton.PluginAction", new IMAGE_BRUSH_SVG(TEXT("PlaceholderButtonIcon"), Icon20x20));
+	Style->Set("CinematicModeButton.PluginAction", new IMAGE_BRUSH_SVG(TEXT("CinematicModeIcon"), Icon20x20));
+	Style->Set("CinematicModeButton.PluginAction02", new IMAGE_BRUSH_SVG(TEXT("60CinemaStyleModeIcon"), Icon20x20));
 	return Style;
 }
 

@@ -3,7 +3,7 @@
 	"Version": 1,
 	"VersionName": "1.0",
 	"FriendlyName": "CinematicModeButton",
-	"Description": "A simple button which adds a Post Process Volume, sets manual exposure, adds a vigenette effect and adds a CineCameraActor to the scene.",
+	"Description": "A simple button which adds a Post Process Volume, sets manual exposure, adds a vignette effect and adds a CineCameraActor to the scene.",
 	"Category": "Other",
 	"CreatedBy": "Ashkan Abedi",
 	"CreatedByURL": "",

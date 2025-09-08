@@ -32,6 +32,11 @@ void FCinematicModeButtonModule::StartupModule()
 		FExecuteAction::CreateRaw(this, &FCinematicModeButtonModule::PluginButtonClicked),
 		FCanExecuteAction());
 
+	PluginCommands->MapAction(
+		FCinematicModeButtonCommands::Get().PluginAction02,
+		FExecuteAction::CreateRaw(this, &FCinematicModeButtonModule::PluginButton02Clicked),
+		FCanExecuteAction());
+
 	UToolMenus::RegisterStartupCallback(FSimpleMulticastDelegate::FDelegate::CreateRaw(this, &FCinematicModeButtonModule::RegisterMenus));
 }
 
@@ -58,12 +63,18 @@ void FCinematicModeButtonModule::PluginButtonClicked()
 	if (AActor* FoundLightActor = FindActorInLevel(ADirectionalLight::StaticClass()))
 	{
 		ADirectionalLight* LightActor = Cast<ADirectionalLight>(FoundLightActor);
+		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
 		LightActor->GetLightComponent()->SetIntensity(1);
+		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightActor->GetLightComponent()->SetTemperature(4500.f);
 	} else
 	{
 		AActor* NewLightActor = AddActorToLevel(ADirectionalLight::StaticClass());
 		ADirectionalLight* LightActor = Cast<ADirectionalLight>(NewLightActor);
+		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
 		LightActor->GetLightComponent()->SetIntensity(1);
+		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightActor->GetLightComponent()->SetTemperature(4500.f);
 	}
 
 	if (AActor* FoundPPVolActor = FindActorInLevel(APostProcessVolume::StaticClass()))
@@ -73,7 +84,9 @@ void FCinematicModeButtonModule::PluginButtonClicked()
 		PPVolActor->Settings.bOverride_AutoExposureBias = true;
 		PPVolActor->Settings.AutoExposureBias = 0;
 		PPVolActor->Settings.bOverride_VignetteIntensity = true;
-		PPVolActor->Settings.VignetteIntensity = 2.5f;
+		PPVolActor->Settings.VignetteIntensity = 1.f;
+		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
+		PPVolActor->Settings.FilmGrainIntensity = 1.f;
 	} else
 	{
 		AActor* NewPPVolActor = AddActorToLevel(APostProcessVolume::StaticClass());
@@ -82,7 +95,59 @@ void FCinematicModeButtonModule::PluginButtonClicked()
 		PPVolActor->Settings.bOverride_AutoExposureBias = true;
 		PPVolActor->Settings.AutoExposureBias = 0;
 		PPVolActor->Settings.bOverride_VignetteIntensity = true;
-		PPVolActor->Settings.VignetteIntensity = 2.5f;
+		PPVolActor->Settings.VignetteIntensity = 1.f;
+		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
+		PPVolActor->Settings.FilmGrainIntensity = 1.f;
+	}
+}
+
+void FCinematicModeButtonModule::PluginButton02Clicked()
+{
+	FText DialogText = FText::FromString("Enabling 60's Cinematic Style for This Level");
+	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
+
+	if (AActor* FoundLightActor = FindActorInLevel(ADirectionalLight::StaticClass()))
+	{
+		ADirectionalLight* LightActor = Cast<ADirectionalLight>(FoundLightActor);
+		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
+		LightActor->GetLightComponent()->SetIntensity(1);
+		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightActor->GetLightComponent()->SetTemperature(4500.f);
+	} else
+	{
+		AActor* NewLightActor = AddActorToLevel(ADirectionalLight::StaticClass());
+		ADirectionalLight* LightActor = Cast<ADirectionalLight>(NewLightActor);
+		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
+		LightActor->GetLightComponent()->SetIntensity(1);
+		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightActor->GetLightComponent()->SetTemperature(4500.f);
+	}
+
+	if (AActor* FoundPPVolActor = FindActorInLevel(APostProcessVolume::StaticClass()))
+	{
+		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(FoundPPVolActor);
+		PPVolActor->bUnbound = true;
+		PPVolActor->Settings.bOverride_AutoExposureBias = true;
+		PPVolActor->Settings.AutoExposureBias = 0;
+		PPVolActor->Settings.bOverride_VignetteIntensity = true;
+		PPVolActor->Settings.VignetteIntensity = 1.3f;
+		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
+		PPVolActor->Settings.FilmGrainIntensity = 0.8f;
+		PPVolActor->Settings.bOverride_ColorSaturation = true;
+		PPVolActor->Settings.ColorSaturation = FVector4(1, 1, 1, 0);
+	} else
+	{
+		AActor* NewPPVolActor = AddActorToLevel(APostProcessVolume::StaticClass());
+		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(NewPPVolActor);
+		PPVolActor->bUnbound = true;
+		PPVolActor->Settings.bOverride_AutoExposureBias = true;
+		PPVolActor->Settings.AutoExposureBias = 0;
+		PPVolActor->Settings.bOverride_VignetteIntensity = true;
+		PPVolActor->Settings.VignetteIntensity = 1.3f;
+		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
+		PPVolActor->Settings.FilmGrainIntensity = 0.8f;
+		PPVolActor->Settings.bOverride_ColorSaturation = true;
+		PPVolActor->Settings.ColorSaturation = FVector4(1, 1, 1, 0);
 	}
 }
 
@@ -106,6 +171,9 @@ void FCinematicModeButtonModule::RegisterMenus()
 			{
 				FToolMenuEntry& Entry = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FCinematicModeButtonCommands::Get().PluginAction));
 				Entry.SetCommandList(PluginCommands);
+
+				FToolMenuEntry& Entry02 = Section.AddEntry(FToolMenuEntry::InitToolBarButton(FCinematicModeButtonCommands::Get().PluginAction02));
+				Entry02.SetCommandList(PluginCommands);
 			}
 		}
 	}

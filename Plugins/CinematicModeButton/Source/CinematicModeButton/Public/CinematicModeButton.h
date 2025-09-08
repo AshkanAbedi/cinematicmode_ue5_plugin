@@ -20,14 +20,15 @@ public:
 	
 	/** This function will be bound to Command. */
 	void PluginButtonClicked();
+	void PluginButton02Clicked();
 
 	
 private:
 
 	void RegisterMenus();
-	
-	AActor* FindActorInLevel(TSubclassOf<AActor> ActorClass); 
-	AActor* AddActorToLevel(TSubclassOf<AActor> ActorClass);
+
+	static AActor* FindActorInLevel(TSubclassOf<AActor> ActorClass);
+	static AActor* AddActorToLevel(TSubclassOf<AActor> ActorClass);
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;
