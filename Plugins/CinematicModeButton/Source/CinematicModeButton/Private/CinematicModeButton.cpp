@@ -1,5 +1,4 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
-
 #include "CinematicModeButton.h"
 #include "CinematicModeButtonStyle.h"
 #include "CinematicModeButtonCommands.h"

@@ -13,7 +13,6 @@ class FMenuBuilder;
 class FCinematicModeButtonModule : public IModuleInterface
 {
 public:
-
 	/** IModuleInterface implementation */
 	virtual void StartupModule() override;
 	virtual void ShutdownModule() override;
@@ -24,9 +23,7 @@ public:
 
 	
 private:
-
 	void RegisterMenus();
-
 	static AActor* FindActorInLevel(TSubclassOf<AActor> ActorClass);
 	static AActor* AddActorToLevel(TSubclassOf<AActor> ActorClass);
 
