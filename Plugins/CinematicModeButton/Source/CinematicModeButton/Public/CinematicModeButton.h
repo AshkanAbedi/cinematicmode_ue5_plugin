@@ -9,6 +9,7 @@
 
 class FToolBarBuilder;
 class FMenuBuilder;
+struct FCinematicStylePreset;
 
 class FCinematicModeButtonModule : public IModuleInterface
 {
@@ -24,6 +25,8 @@ public:
 	
 private:
 	void RegisterMenus();
+	void ApplyCinematicStyle(UWorld* World, const FCinematicStylePreset& Preset);
+	
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;

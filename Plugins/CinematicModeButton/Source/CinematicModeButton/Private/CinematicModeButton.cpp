@@ -54,6 +54,48 @@ void FCinematicModeButtonModule::ShutdownModule()
 	FCinematicModeButtonCommands::Unregister();
 }
 
+struct FCinematicLightPreset
+{
+	FRotator Rotation = FRotator::ZeroRotator;
+	float Intensity = 1.0f;
+	FLinearColor Color = FLinearColor::White;
+	float Temperature = 6500.0f;
+};
+
+struct FCinematicPostProcessPreset
+{
+	bool bOverrideExposure = true;
+	float ExposureBias = 0.f;
+
+	bool bOverrideVignette = true;
+	float VignetteIntensity = 1.f;
+
+	bool bOverrideFilmGrain = true;
+	float FilmGrainIntensity = 1.f;
+
+	bool bOverrideSaturation = false;
+	FVector4 ColorSaturation = FVector4(1, 1, 1, 0);
+};
+
+struct FCinematicStylePreset
+{
+	FString Name;
+	FCinematicLightPreset Light;
+	FCinematicPostProcessPreset PostProcess;
+};
+
+const FCinematicStylePreset DefaultCinematicPreset{
+	"Default Mode",
+{FRotator(315.f, -165.f, 221.f), 1.f, FLinearColor(255.f,193.f,212.f), 4500.f},
+{true, 0.f, true, 1.f, true, 1.f, false, FVector4(1,1,1,0)}
+};
+
+const FCinematicStylePreset SixtiesCinematicPreset {
+	"60's Style Mode",
+{FRotator(315.f, -165.f, 221.f), 1.f, FLinearColor(255.f,193.f,212.f), 4500.f},
+{true, 0.f, true, 1.3f, true, 0.8f, true, FVector4(1,1,1,0)}
+};
+
 template <typename T>
 T* FindOrAddActor(UWorld* World, TFunction<void(T*)> InitFunc)
 {
@@ -78,62 +120,62 @@ T* FindOrAddActor(UWorld* World, TFunction<void(T*)> InitFunc)
 	return Actor;
 }
 
+void FCinematicModeButtonModule::ApplyCinematicStyle(UWorld* World, const FCinematicStylePreset& Preset)
+{
+	if (!World) return;
+
+	FMessageDialog::Open(EAppMsgType::Ok, FText::FromString("Applying " + Preset.Name + "!"));
+	
+	FindOrAddActor<ADirectionalLight>(World, [&](ADirectionalLight* LightActor)
+	{
+		ULightComponent* LightComp = LightActor->GetLightComponent();
+		LightActor->SetActorRotation(Preset.Light.Rotation);
+		LightComp->SetIntensity(Preset.Light.Intensity);
+		LightComp->SetLightColor(Preset.Light.Color);
+		LightComp->SetTemperature(Preset.Light.Temperature);
+	});
+	
+	FindOrAddActor<APostProcessVolume>(World, [&](APostProcessVolume* PPVolActor)
+	{
+		PPVolActor->bUnbound = true;
+
+		if (Preset.PostProcess.bOverrideExposure)
+		{
+			PPVolActor->Settings.bOverride_AutoExposureBias = true;
+			PPVolActor->Settings.AutoExposureBias = Preset.PostProcess.ExposureBias;
+		}
+
+		if (Preset.PostProcess.bOverrideVignette)
+		{
+			PPVolActor->Settings.bOverride_VignetteIntensity = true;
+			PPVolActor->Settings.VignetteIntensity = Preset.PostProcess.VignetteIntensity;
+		}
+
+		if (Preset.PostProcess.bOverrideFilmGrain)
+		{
+			PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
+			PPVolActor->Settings.FilmGrainIntensity = Preset.PostProcess.FilmGrainIntensity;
+		}
+
+		if (Preset.PostProcess.bOverrideSaturation)
+		{
+			PPVolActor->Settings.bOverride_ColorSaturation = true;
+			PPVolActor->Settings.ColorSaturation = Preset.PostProcess.ColorSaturation;
+		}
+	});
+	
+}
+
 void FCinematicModeButtonModule::PluginButtonClicked()
 {
 	// Put your "OnButtonClicked" stuff here
-	const FText DialogText = FText::FromString("Enabling Cinematic Mode for This Level");
-	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
-
-	UWorld* World = GWorld;
-
-	FindOrAddActor<ADirectionalLight>(World, [](ADirectionalLight* LightActor){
-		ULightComponent* LightComponent = LightActor->GetLightComponent();
-		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightComponent->SetIntensity(1);
-		LightComponent->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightComponent->SetTemperature(4500.f);
-	});
-
-	FindOrAddActor<APostProcessVolume>(World, [](APostProcessVolume* PPVolActor)
-	{
-		PPVolActor->bUnbound = true;
-		PPVolActor->Settings.bOverride_AutoExposureBias = true;
-		PPVolActor->Settings.AutoExposureBias = 0;
-		PPVolActor->Settings.bOverride_VignetteIntensity = true;
-		PPVolActor->Settings.VignetteIntensity = 1.f;
-		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
-		PPVolActor->Settings.FilmGrainIntensity = 1.f;
-	});
+	ApplyCinematicStyle(GWorld, DefaultCinematicPreset);
 }
 
 void FCinematicModeButtonModule::PluginButton02Clicked()
 {
 	// Put your "OnButtonClicked" stuff here
-	const FText DialogText = FText::FromString("Enabling 60's Style Cinematic Mode for This Level");
-	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
-
-	UWorld* World = GWorld;
-
-	FindOrAddActor<ADirectionalLight>(World, [](ADirectionalLight* LightActor){
-		ULightComponent* LightComp = LightActor->GetLightComponent();
-		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightComp->SetIntensity(1);
-		LightComp->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightComp->SetTemperature(4500.f);
-	});
-
-	FindOrAddActor<APostProcessVolume>(World, [](APostProcessVolume* PPVolActor)
-	{
-		PPVolActor->bUnbound = true;
-		PPVolActor->Settings.bOverride_AutoExposureBias = true;
-		PPVolActor->Settings.AutoExposureBias = 0;
-		PPVolActor->Settings.bOverride_VignetteIntensity = true;
-		PPVolActor->Settings.VignetteIntensity = 1.3f;
-		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
-		PPVolActor->Settings.FilmGrainIntensity = 0.8f;
-		PPVolActor->Settings.bOverride_ColorSaturation = true;
-		PPVolActor->Settings.ColorSaturation = FVector4(1, 1, 1, 0);
-	});
+	ApplyCinematicStyle(GWorld, SixtiesCinematicPreset);
 }
 
 void FCinematicModeButtonModule::RegisterMenus()
