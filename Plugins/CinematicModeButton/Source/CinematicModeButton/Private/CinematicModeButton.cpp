@@ -1,4 +1,6 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
+// ReSharper disable CppMemberFunctionMayBeStatic
+// ReSharper disable CppTooWideScope
 #include "CinematicModeButton.h"
 #include "CinematicModeButtonStyle.h"
 #include "CinematicModeButtonCommands.h"
@@ -79,17 +81,17 @@ T* FindOrAddActor(UWorld* World, TFunction<void(T*)> InitFunc)
 void FCinematicModeButtonModule::PluginButtonClicked()
 {
 	// Put your "OnButtonClicked" stuff here
-	FText DialogText = FText::FromString("Enabling Cinematic Mode for This Level");
+	const FText DialogText = FText::FromString("Enabling Cinematic Mode for This Level");
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
 
 	UWorld* World = GWorld;
 
 	FindOrAddActor<ADirectionalLight>(World, [](ADirectionalLight* LightActor){
-		auto LightComponent = LightActor->GetLightComponent();
+		ULightComponent* LightComponent = LightActor->GetLightComponent();
 		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightActor->GetLightComponent()->SetIntensity(1);
-		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightActor->GetLightComponent()->SetTemperature(4500.f);
+		LightComponent->SetIntensity(1);
+		LightComponent->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightComponent->SetTemperature(4500.f);
 	});
 
 	FindOrAddActor<APostProcessVolume>(World, [](APostProcessVolume* PPVolActor)
@@ -107,17 +109,17 @@ void FCinematicModeButtonModule::PluginButtonClicked()
 void FCinematicModeButtonModule::PluginButton02Clicked()
 {
 	// Put your "OnButtonClicked" stuff here
-	FText DialogText = FText::FromString("Enabling 60's Style Cinematic Mode for This Level");
+	const FText DialogText = FText::FromString("Enabling 60's Style Cinematic Mode for This Level");
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
 
 	UWorld* World = GWorld;
 
 	FindOrAddActor<ADirectionalLight>(World, [](ADirectionalLight* LightActor){
-		auto LightComponent = LightActor->GetLightComponent();
+		ULightComponent* LightComp = LightActor->GetLightComponent();
 		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightActor->GetLightComponent()->SetIntensity(1);
-		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightActor->GetLightComponent()->SetTemperature(4500.f);
+		LightComp->SetIntensity(1);
+		LightComp->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightComp->SetTemperature(4500.f);
 	});
 
 	FindOrAddActor<APostProcessVolume>(World, [](APostProcessVolume* PPVolActor)
