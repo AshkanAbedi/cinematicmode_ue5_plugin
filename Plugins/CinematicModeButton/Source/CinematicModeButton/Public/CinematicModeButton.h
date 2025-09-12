@@ -24,8 +24,6 @@ public:
 	
 private:
 	void RegisterMenus();
-	static AActor* FindActorInLevel(TSubclassOf<AActor> ActorClass);
-	static AActor* AddActorToLevel(TSubclassOf<AActor> ActorClass);
 
 private:
 	TSharedPtr<class FUICommandList> PluginCommands;

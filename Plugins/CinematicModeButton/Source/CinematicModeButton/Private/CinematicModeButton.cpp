@@ -18,7 +18,6 @@ static const FName CinematicModeButtonTabName("CinematicModeButton");
 void FCinematicModeButtonModule::StartupModule()
 {
 	// This code will execute after your module is loaded into memory; the exact timing is specified in the .uplugin file per-module
-	
 	FCinematicModeButtonStyle::Initialize();
 	FCinematicModeButtonStyle::ReloadTextures();
 
@@ -53,32 +52,48 @@ void FCinematicModeButtonModule::ShutdownModule()
 	FCinematicModeButtonCommands::Unregister();
 }
 
+template <typename T>
+T* FindOrAddActor(UWorld* World, TFunction<void(T*)> InitFunc)
+{
+	if (!World) return nullptr;
+
+	TArray<AActor*> FoundActors;
+	UGameplayStatics::GetAllActorsOfClass(World, T::StaticClass(), FoundActors);
+	T* Actor = nullptr;
+
+	if (FoundActors.Num() > 0)
+	{
+		Actor = Cast<T>(FoundActors[0]);
+	} else
+	{
+		Actor = World->SpawnActor<T>(T::StaticClass(), FTransform::Identity);
+	}
+
+	if (Actor && InitFunc)
+	{
+		InitFunc(Actor);
+	}
+	return Actor;
+}
+
 void FCinematicModeButtonModule::PluginButtonClicked()
 {
 	// Put your "OnButtonClicked" stuff here
 	FText DialogText = FText::FromString("Enabling Cinematic Mode for This Level");
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
 
-	if (AActor* FoundLightActor = FindActorInLevel(ADirectionalLight::StaticClass()))
-	{
-		ADirectionalLight* LightActor = Cast<ADirectionalLight>(FoundLightActor);
-		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightActor->GetLightComponent()->SetIntensity(1);
-		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightActor->GetLightComponent()->SetTemperature(4500.f);
-	} else
-	{
-		AActor* NewLightActor = AddActorToLevel(ADirectionalLight::StaticClass());
-		ADirectionalLight* LightActor = Cast<ADirectionalLight>(NewLightActor);
-		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightActor->GetLightComponent()->SetIntensity(1);
-		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightActor->GetLightComponent()->SetTemperature(4500.f);
-	}
+	UWorld* World = GWorld;
 
-	if (AActor* FoundPPVolActor = FindActorInLevel(APostProcessVolume::StaticClass()))
+	FindOrAddActor<ADirectionalLight>(World, [](ADirectionalLight* LightActor){
+		auto LightComponent = LightActor->GetLightComponent();
+		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
+		LightActor->GetLightComponent()->SetIntensity(1);
+		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightActor->GetLightComponent()->SetTemperature(4500.f);
+	});
+
+	FindOrAddActor<APostProcessVolume>(World, [](APostProcessVolume* PPVolActor)
 	{
-		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(FoundPPVolActor);
 		PPVolActor->bUnbound = true;
 		PPVolActor->Settings.bOverride_AutoExposureBias = true;
 		PPVolActor->Settings.AutoExposureBias = 0;
@@ -86,45 +101,27 @@ void FCinematicModeButtonModule::PluginButtonClicked()
 		PPVolActor->Settings.VignetteIntensity = 1.f;
 		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
 		PPVolActor->Settings.FilmGrainIntensity = 1.f;
-	} else
-	{
-		AActor* NewPPVolActor = AddActorToLevel(APostProcessVolume::StaticClass());
-		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(NewPPVolActor);
-		PPVolActor->bUnbound = true;
-		PPVolActor->Settings.bOverride_AutoExposureBias = true;
-		PPVolActor->Settings.AutoExposureBias = 0;
-		PPVolActor->Settings.bOverride_VignetteIntensity = true;
-		PPVolActor->Settings.VignetteIntensity = 1.f;
-		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
-		PPVolActor->Settings.FilmGrainIntensity = 1.f;
-	}
+	});
 }
 
 void FCinematicModeButtonModule::PluginButton02Clicked()
 {
-	FText DialogText = FText::FromString("Enabling 60's Cinematic Style for This Level");
+	// Put your "OnButtonClicked" stuff here
+	FText DialogText = FText::FromString("Enabling 60's Style Cinematic Mode for This Level");
 	FMessageDialog::Open(EAppMsgType::Ok, DialogText);
 
-	if (AActor* FoundLightActor = FindActorInLevel(ADirectionalLight::StaticClass()))
-	{
-		ADirectionalLight* LightActor = Cast<ADirectionalLight>(FoundLightActor);
-		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightActor->GetLightComponent()->SetIntensity(1);
-		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightActor->GetLightComponent()->SetTemperature(4500.f);
-	} else
-	{
-		AActor* NewLightActor = AddActorToLevel(ADirectionalLight::StaticClass());
-		ADirectionalLight* LightActor = Cast<ADirectionalLight>(NewLightActor);
-		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
-		LightActor->GetLightComponent()->SetIntensity(1);
-		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
-		LightActor->GetLightComponent()->SetTemperature(4500.f);
-	}
+	UWorld* World = GWorld;
 
-	if (AActor* FoundPPVolActor = FindActorInLevel(APostProcessVolume::StaticClass()))
+	FindOrAddActor<ADirectionalLight>(World, [](ADirectionalLight* LightActor){
+		auto LightComponent = LightActor->GetLightComponent();
+		LightActor->SetActorRotation(FRotator(315.f, -165.f, 221.f));
+		LightActor->GetLightComponent()->SetIntensity(1);
+		LightActor->GetLightComponent()->SetLightColor(FLinearColor(255.f, 193.f, 212.f));
+		LightActor->GetLightComponent()->SetTemperature(4500.f);
+	});
+
+	FindOrAddActor<APostProcessVolume>(World, [](APostProcessVolume* PPVolActor)
 	{
-		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(FoundPPVolActor);
 		PPVolActor->bUnbound = true;
 		PPVolActor->Settings.bOverride_AutoExposureBias = true;
 		PPVolActor->Settings.AutoExposureBias = 0;
@@ -134,20 +131,7 @@ void FCinematicModeButtonModule::PluginButton02Clicked()
 		PPVolActor->Settings.FilmGrainIntensity = 0.8f;
 		PPVolActor->Settings.bOverride_ColorSaturation = true;
 		PPVolActor->Settings.ColorSaturation = FVector4(1, 1, 1, 0);
-	} else
-	{
-		AActor* NewPPVolActor = AddActorToLevel(APostProcessVolume::StaticClass());
-		APostProcessVolume* PPVolActor = Cast<APostProcessVolume>(NewPPVolActor);
-		PPVolActor->bUnbound = true;
-		PPVolActor->Settings.bOverride_AutoExposureBias = true;
-		PPVolActor->Settings.AutoExposureBias = 0;
-		PPVolActor->Settings.bOverride_VignetteIntensity = true;
-		PPVolActor->Settings.VignetteIntensity = 1.3f;
-		PPVolActor->Settings.bOverride_FilmGrainIntensity = true;
-		PPVolActor->Settings.FilmGrainIntensity = 0.8f;
-		PPVolActor->Settings.bOverride_ColorSaturation = true;
-		PPVolActor->Settings.ColorSaturation = FVector4(1, 1, 1, 0);
-	}
+	});
 }
 
 void FCinematicModeButtonModule::RegisterMenus()
@@ -176,28 +160,6 @@ void FCinematicModeButtonModule::RegisterMenus()
 			}
 		}
 	}
-}
-
-AActor* FCinematicModeButtonModule::FindActorInLevel(TSubclassOf<AActor> ActorClass)
-{
-	TArray<AActor*> FoundActors;
-
-	const UObject* WorldContextObject = GWorld;
-
-	UGameplayStatics::GetAllActorsOfClass(WorldContextObject, ActorClass, FoundActors);
-
-	if (FoundActors.Num() > 0)
-	{
-		return FoundActors[0];
-	}
-		
-	return nullptr;
-}
-
-AActor* FCinematicModeButtonModule::AddActorToLevel(TSubclassOf<AActor> ActorClass)
-{
-	ULevel* CurrentLevel = GWorld->GetCurrentLevel();
-	return CurrentLevel->OwningWorld->SpawnActor<AActor>(ActorClass, FTransform::Identity);
 }
 
 #undef LOCTEXT_NAMESPACE
